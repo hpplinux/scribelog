@@ -5,3 +5,8 @@ tags
 .settings
 .buildpath
 *.bak
+*.o
+*vc*
+*.ncb
+*.sln
+*.suo
