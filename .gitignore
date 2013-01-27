@@ -1,0 +1,7 @@
+*.log
+tags
+*.swp
+.project
+.settings
+.buildpath
+*.bak
