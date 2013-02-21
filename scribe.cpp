@@ -23,15 +23,6 @@ int main(int argc,char *argv[])
         return 0;
     }
 
-	//初始化处理中心
-    if(CProcCenter::getInstance().init() < 0)
-    {
-        LOG_ERROR("proccenter init:%s\n",CProcCenter::getInstance().getErrMsg());
-        return 0;
-    }
-
-    CProcCenter::getInstance().run();//开启处理线程池
-
     stConfig.iUdpSrvId = CCommMgr::getInstance().createSrv(CCommMgr::SRV_UDP,stConfig.sUdpIp,
                                             stConfig.wUdpPort,
                                             stConfig.dwUdpRecvBufSize,
@@ -48,6 +39,14 @@ int main(int argc,char *argv[])
 
 	CCommMgr::getInstance().setProcessor(stConfig.iUdpSrvId,&CProcCenter::getInstance(),CCommMgr::PKG_RAW);
 
+	//初始化处理中心
+    if(CProcCenter::getInstance().init() < 0)
+    {
+        LOG_ERROR("proccenter init:%s\n",CProcCenter::getInstance().getErrMsg());
+        return 0;
+    }
+
+    CProcCenter::getInstance().run();//开启处理线程池
 
     CCommMgr::getInstance().start();
 

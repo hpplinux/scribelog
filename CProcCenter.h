@@ -26,7 +26,7 @@ public:
     void onClose(SSession &stSession);
     void onConnect(SSession &stSession,bool bOk);
     void onError(SSession &stSession,const char * szErrMsg,int iError);
-    void onWork(int iTaskType,void *pData);
+    void onWork(int iTaskType,void *pData,int iIndex);
     void onTimer(uint32_t dwTimerId,void *pData);
     void onMessage(uint32_t dwMsgType,void *pData);
 

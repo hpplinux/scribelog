@@ -120,7 +120,7 @@ void CProcCenter::onMessage(uint32_t dwMsgType,void *pData)
 }
 
 //线程函数 对于共享资源需加锁
-void CProcCenter::onWork(int iTaskType,void *pData)
+void CProcCenter::onWork(int iTaskType,void *pData,int iIndex)
 {
 	for(MAP_LOG_BUFFER::iterator it=m_mapLogBuffer.begin();it!=m_mapLogBuffer.end();++it)
 	{
