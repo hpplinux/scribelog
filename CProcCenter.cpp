@@ -35,26 +35,42 @@ void CProcCenter::onRead(SSession &stSession,const char * pszData, const int iSi
 		string sModule;
 		string sMsg;
 
-		if(pszData[0] == '{')
-		{
-			CAnyValue oValue;
-			oValue.decodeJSON(pszData,iSize);
-			sModule = oValue["module"].asString();
-			sMsg = oValue["msg"].asString();
+		PkgLog oPkg;
+		oPkg.setPkgData(pszData,iSize);
 
-			if(sModule.empty() || sMsg.empty())
-			{
-				sMsg.assign(pszData,iSize);
-				LOG_WARN("json msg module or msg is empty,data:%s",sMsg.c_str());
-				return;
-			}
-			LOG_DEBUG("json msg module:%s,msg:%s",sModule.c_str(),sMsg.c_str());
-		}
-		else
+
+		if(oPkg.head().getFieldNum() > 2)
 		{
-			sMsg.assign(pszData,iSize);
-			LOG_DEBUG("not json msg:%s",sMsg.c_str());
+			LOG_WARN("field num invalid");
+			return;
 		}
+
+		for(uint16_t i= 0;i<oPkg.head().getFieldNum();i++)
+		{
+			uint8_t cType = 0;
+			oPkg>>cType;
+
+			switch(cType)
+			{
+			case TYPE_MODULE:
+				{
+					oPkg.readString2(sModule);
+				}			
+			break;
+			case TYPE_MSG:
+				{
+					oPkg.readString2(sMsg);
+				}
+			break;
+			default:
+				uint16_t wLen = 0;
+				oPkg>> wLen;
+				oPkg.seek(wLen);
+			}
+		}
+
+		LOG_DEBUG("log msg module:%s,msg:%s",sModule.c_str(),sMsg.c_str());
+
 
 		sMsg.append("\n");
 
@@ -76,7 +92,7 @@ void CProcCenter::onRead(SSession &stSession,const char * pszData, const int iSi
 		}
 
 	}
-	catch(const CAnyValue::Error e)
+	catch(const CPackage<SHead>::Error e)
 	{
 		LOG_ERROR("package decode error: %s",e.what());
 	}
@@ -108,7 +124,7 @@ void CProcCenter::onTimer(uint32_t dwTimerId,void *pData)
 }
 
 
-void CProcCenter::onMessage(uint32_t dwMsgType,void *pData)
+void CProcCenter::onMessage(int dwMsgType,void *pData)
 {
 	if((int)dwMsgType == WRITE_MSG_ID)
 	{

@@ -9,9 +9,44 @@ const int WRITE_TIMER_ID = 1;
 const int WRITE_MSG_ID = 1;
 const size_t MAX_MODULE_NUM = 255;
 
+
+#pragma pack(1)
+
+struct SHead
+{
+private:
+		uint16_t m_wFieldNum;
+public:
+	SHead(){ m_wFieldNum = 0;}
+
+
+	uint16_t getFieldNum()
+	{
+		return  ntohs(m_wFieldNum);
+	}
+
+	void setFieldNum(uint16_t wFieldNum)
+	{
+		m_wFieldNum = htons(m_wFieldNum);
+	}
+
+};
+
+#pragma pack()
+
+//wFiledNum+cModuleTpye+wLen+sModule+cMsgType+wLen+sMsg
+typedef CPackage<SHead> PkgLog; 
+
 class CProcCenter :public CTask, public CProcessor
 {
 public:
+
+	enum {
+		TYPE_MODULE = 1,
+		TYPE_MSG = 2,
+
+	};
+
 	struct SWriteInfo
 	{
 		int iSize;
@@ -28,7 +63,7 @@ public:
     void onError(SSession &stSession,const char * szErrMsg,int iError);
     void onWork(int iTaskType,void *pData,int iIndex);
     void onTimer(uint32_t dwTimerId,void *pData);
-    void onMessage(uint32_t dwMsgType,void *pData);
+    void onMessage(int dwMsgType,void *pData);
 
 
 	static CProcCenter& getInstance()
